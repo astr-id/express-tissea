@@ -1,7 +1,7 @@
-const Line = require("../models/Line");
-const Stop = require("../models/Stop");
-const LineStop = require("../models/LineStop");
-const User = require("../models/User");
+const Line = require("../models/lineModel");
+const Stop = require("../models/stopModel");
+const LineStop = require("../models/lineStopModel");
+const User = require("../models/userModel");
 const haversine = require("haversine-distance");
 
 // 4. GET - api/stats/distance/stops/:id/:id

@@ -5,7 +5,7 @@ const {
   getLinesByCategory,
   getLineDetails,
   getLineStops,
-  addStopToLine,
+  addStop,
   updateLine,
   deleteStopFromLine,
 } = require("../controllers/categoriesController");
@@ -19,8 +19,8 @@ router.get("/:id/lines/:lineId", getLineDetails);
 // 3. GET - /api/categories/:id/lines/:id/stops
 router.get("/:id/lines/:lineId/stops", getLineStops);
 
-// // 8. POST - /api/categories/:id/lines/:id/stops
-// router.post("/:id/lines/:lineId/stops", addStopToLine);
+// 8. POST - /api/categories/:id/lines/:id/stops
+router.post("/:id/lines/:lineId/stops", addStop);
 
 // // 9. PUT - /api/categories/:id/lines/:id
 // router.put("/:id/lines/:lineId", updateLine);

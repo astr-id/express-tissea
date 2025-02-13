@@ -1,23 +1,22 @@
-const Category = require("../models/Category");
+const Category = require("../models/categoryModel");
 
 const seedCategories = async () => {
   try {
-    const count = await Category.countDocuments(); // Utilisation de `await` pour récupérer le nombre de documents
-    if (count === 0) {
-      // Si la collection est vide, on insère les catégories
-      const categories = [
-        { name: "Bus" },
-        { name: "Métro" },
-        { name: "Tramway" },
-      ];
+    // Supprime toutes les catégories existantes
+    await Category.deleteMany({});
+    console.log("Toutes les catégories ont été supprimées.");
 
-      const documents = await Category.insertMany(categories); // Utilisation de `await` ici
-      console.log("Catégories insérées :", documents);
-    } else {
-      console.log("Les catégories existent déjà dans la base de données.");
-    }
+    // Insère les nouvelles catégories
+    const categories = [
+      { name: "Bus" },
+      { name: "Métro" },
+      { name: "Tramway" },
+    ];
+
+    const documents = await Category.insertMany(categories);
+    console.log("Nouvelles catégories insérées :", documents);
   } catch (error) {
-    console.error("Erreur lors de l'insertion des catégories", error);
+    console.error("Erreur lors de l'insertion des catégories :", error);
   }
 };
 

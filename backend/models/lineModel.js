@@ -23,5 +23,4 @@ const lineSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Line = mongoose.model("Line", lineSchema);
-module.exports = Line;
+module.exports = mongoose.model("Line", lineSchema);

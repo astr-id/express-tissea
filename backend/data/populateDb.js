@@ -14,7 +14,7 @@ const populateDb = async () => {
     await connectDB(); 
     await seedCategories(); 
     await seedLines(); 
-    await seedStops(); 
+     await seedStops(); 
     await seedLineStops(); 
     console.log("Base de données implémenté avec succès.");
     process.exit(); 
