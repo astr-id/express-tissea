@@ -16,7 +16,7 @@ exports.getDistanceBetweenStops = async (req, res) => {
 
     // Vérification si les arrêts existent
     if (!startStop || !endStop) {
-      return res.status(404).json({ message: "Arrêts non trouvés." });
+      return res.status(404).json({ message: "Cet arrêt n'existe pas" });
     }
 
     // Calcul de la distance entre les deux arrêts en utilisant la fonction Haversine

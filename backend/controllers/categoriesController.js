@@ -26,9 +26,8 @@ exports.getLineDetails = async (req, res) => {
     // Recherche la ligne par son ID
     const line = await Line.findById(lineId);
 
-    // Si la ligne n'est pas trouvée ou que la catégorie ne correspond pas
     if (!line || line.category.toString() !== id) {
-      return res.status(404).json({ message: "Ligne non trouvée." });
+      return res.status(404).json({ message: "Cette ligne n'existe pas" });
     }
 
     // Recherche les arrêts associés à la ligne
@@ -60,9 +59,8 @@ exports.getLineStops = async (req, res) => {
     // Recherche la ligne par son ID
     const line = await Line.findById(lineId);
 
-    // Si la ligne n'est pas trouvée ou que la catégorie ne correspond pas
     if (!line || line.category.toString() !== id) {
-      return res.status(404).json({ message: "Ligne non trouvée." });
+      return res.status(404).json({ message: "Cette ligne n'existe pas" });
     }
 
     // Recherche les arrêts associés à la ligne
@@ -94,13 +92,13 @@ exports.addStop = async (req, res) => {
     // Recherche la ligne par son ID
     const line = await Line.findById(lineId);
     if (!line || line.category.toString() !== id) {
-      return res.status(404).json({ message: "Ligne non trouvée." });
+      return res.status(404).json({ message: "Cette ligne n'existe pas" });
     }
 
     // Vérifie si l'arrêt existe déjà dans la base de données
     let stop = await Stop.findOne({ name: stopName });
 
-    // Si l'arrêt existe, vérifier s'il est déjà associé à la ligne
+    // Si l'arrêt existe vérifier s'il est déjà sur la ligne
     if (stop) {
       const stopExistsOnLine = await LineStop.findOne({
         line: lineId,
@@ -112,13 +110,13 @@ exports.addStop = async (req, res) => {
           .json({ message: "Cet arrêt existe déjà sur cette ligne." });
       }
     } else {
-      // Si l'arrêt n'existe pas, on le crée
+      // Si l'arrêt n'existe pas il est crée
       stop = new Stop({
         name: stopName,
         latitude: stopLatitude,
         longitude: stopLongitude,
       });
-      await stop.save(); // Assurez-vous que l'arrêt est bien sauvegardé dans la base
+      await stop.save(); 
     }
 
     // Vérifie si un arrêt avec cet ordre existe déjà
@@ -140,7 +138,6 @@ exports.addStop = async (req, res) => {
 
     await lineStop.save();
 
-    // Renvoie les objets de stop et lineStop dans un seul objet
     res.status(201).json({ stop, lineStop });
   } catch (error) {
     res.status(500).json({
@@ -153,5 +150,73 @@ exports.addStop = async (req, res) => {
 
 // 9. PUT /api/categories/:id/lines/:id
 // Modification des détails de la ligne précisée par :id
+exports.updateLine = async (req, res) => {
+  try {
+    const { id, lineId } = req.params;
+    const { name, startTime, endTime, category } = req.body;
+
+    // Recherche la ligne par son ID
+    const line = await Line.findById(lineId);
+    if (!line || line.category.toString() !== id) {
+      return res.status(404).json({ message: "Cette ligne n'existe pas" });
+    }
+
+    line.name = name;
+    line.start_time = startTime;
+    line.end_time = endTime;
+    line.category = category;
+
+    await line.save();
+
+    res.status(200).json({ message: "Détails de la ligne mis à jour." });
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur lors de la mise à jour des détails de la ligne.",
+      error: error.message,
+    });
+  }
+};
 
 // 10. DELETE - /api/categories/:id/lines/:id/stops/:id
+// Suppression d'un arrêt de la ligne précisée par :id
+exports.deleteStop = async (req, res) => {
+  try {
+    const { id, lineId, stopId } = req.params;
+
+    // Recherche la ligne par son ID
+    const line = await Line.findById(lineId);
+    if (!line || line.category.toString() !== id) {
+      return res.status(404).json({ message: "Cette ligne n'existe pas" });
+    }
+
+    // Recherche l'arrêt par son ID
+    const stop = await Stop.findById(stopId);
+    if (!stop) {
+      return res.status(404).json({ message: "Cet arrêt n'existe pas" });
+    }
+
+    // Recherche et suppression de l'arrêt associé à la ligne
+    const lineStop = await LineStop.findOneAndDelete({
+      line: lineId,
+      stop: stopId,
+    });
+    if (!lineStop) {
+      return res
+        .status(404)
+        .json({ message: "Cet arrêt n'existe pas sur cette ligne" });
+    }
+
+    // Mise à jour de l'ordre des arrêts restants
+    await LineStop.updateMany(
+      { line: lineId, order: { $gt: lineStop.order } },
+      { $inc: { order: -1 } }
+    );
+
+    res.status(200).json({ message: "Arrêt supprimé avec succès." });
+  } catch (error) {
+    res.status(500).json({
+      message: "Erreur lors de la suppression de l'arrêt.",
+      error: error.message,
+    });
+  }
+};
