@@ -5,6 +5,7 @@ const {
   getLinesByCategory,
   getLineDetails,
   getLineStops,
+  getStops,
   addStop,
   updateLine,
   deleteStop,
@@ -13,7 +14,7 @@ const {
 const { protect } = require("../middleware/authMiddleware");
 
 // 1. GET - /api/categories/:id/lines
-router.get("/:id/lines", protect, getLinesByCategory);
+router.get("/:id/lines", getLinesByCategory);
 
 // 2. GET - /api/categories/:id/lines/:id
 router.get("/:id/lines/:lineId", protect, getLineDetails);
