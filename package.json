@@ -12,6 +12,7 @@
   "author": "astrid",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^6.4.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "colors": "^1.4.0",
@@ -21,9 +22,13 @@
     "express-async-handler": "^1.2.0",
     "haversine-distance": "^1.2.3",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.10.0"
+    "mongoose": "^8.10.0",
+    "prisma": "^6.4.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "@vitest/ui": "^3.0.5",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.0.0",
+    "vitest": "^3.0.5"
   }
 }
