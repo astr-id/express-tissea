@@ -1,49 +1,40 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from "supertest";
 import express from "express";
+import { PrismaClient } from "@prisma/client";
 import { getStops } from "../controllers/stopsController";
 
-// Mock Prisma
-const mockFindMany = vi.fn().mockResolvedValue([
-  {
-    id: "67c56be2786aa4f63589fb41",
-    name: "Palais de Justice",
-    latitude: 43.5922,
-    longitude: 1.4447,
-    createdAt: "2025-03-03T08:44:18.177Z",
-    updatedAt: "2025-03-03T08:44:18.177Z",
-  },
-  {
-    id: "67c56be2786aa4f63589fb42",
-    name: "Ile du Ramier",
-    latitude: 43.5922,
-    longitude: 1.4411,
-    createdAt: "2025-03-03T08:44:18.177Z",
-    updatedAt: "2025-03-03T08:44:18.177Z",
-  },
-]);
+const prisma = new PrismaClient();
 
-const mockPrisma = { stop: { findMany: mockFindMany } };
+describe("Tests pour GET /api/stops", () => {
+  const app = express();
+  app.use(express.json());
+  app.get("/api/stops", getStops);
 
-const app = express();
-app.use(express.json());
-app.get("/api/stops", (req, res) => getStops(req, res, mockPrisma)); // On passe le mock ici
+  beforeAll(async () => {
+    const existingStops = await prisma.stop.findMany();
+    if (existingStops.length === 0) {
+      // Si la table est vide insère des données
+      await prisma.stop.createMany({
+        data: [{ name: "Stop 1" }, { name: "Stop 2" }],
+      });
+    }
+  });
 
-describe("GET /api/stops", () => {
-  it("should return a list of stops", async () => {
+  afterAll(async () => {
+    await prisma.stop.deleteMany({
+      where: { name: { startsWith: "Stop" } },
+    });
+    await prisma.$disconnect();
+  });
+
+  it("devrait renvoyer une liste d'arrêts", async () => {
     const response = await request(app).get("/api/stops");
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: expect.any(String),
-          name: expect.any(String),
-        }),
-      ])
-    );
-
-    expect(mockFindMany).toHaveBeenCalled(); // Vérifie que le mock a bien été appelé
-    expect(mockFindMany).toHaveBeenCalledTimes(1);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBeGreaterThan(0); 
+    expect(response.body[0]).toHaveProperty("id");
+    expect(response.body[0]).toHaveProperty("name");
   });
 });
