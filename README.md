@@ -1,6 +1,6 @@
 # 🚌 API Tisséa
 
-Réalisée par ✨Astrid Pierron✨
+Réalisée par ✨Astrid Pierron✨  
 Ce projet est une API REST permettant d'accéder aux informations du réseau de transports en commun.
 
 ## 💻 Technologies Utilisées
@@ -9,12 +9,12 @@ Ce projet est une API REST permettant d'accéder aux informations du réseau de 
 - **Base de données** : MongoDB
 - **ORM** : Prisma 
 - **Frontend** : React
-- **Cartographie** : Leaflet
+- **Carte** : Leaflet
 - **Tests** : Vitest
 
 ## 🔧 Prérequis
 
-Avant de commencer, assurez-vous d'avoir installé les éléméents suivants :
+Avant de commencer, assurez-vous d'avoir installé les éléments suivants :
 - [Node.js](https://nodejs.org/)
 - [MongoDB Compass](https://www.mongodb.com/products/compass)
 
@@ -22,7 +22,7 @@ Avant de commencer, assurez-vous d'avoir installé les éléméents suivants :
 
 ### 1. Cloner le repository
 ```sh
-https://github.com/astr-id/express-tissea.git
+git clone https://github.com/astr-id/express-tissea.git
 cd express-tissea
 ```
 
@@ -33,38 +33,53 @@ npm install
 
 ### 3. Configurer la base de données
 
-1. **Créer le fichier `.env`**
-Voici un exemple de contenu pour le fichier `.env` :
+1. **Créer un compte MongoDB Atlas**  
+   Si vous n'avez pas encore de compte, inscrivez-vous sur [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+
+2. **Créer une organisation et un projet**  
+   Une fois connecté, créez une **organisation** et un **projet**.
+
+3. **Créer un cluster et une base de données**  
+   Créez un **cluster** (par exemple `Cluster0`) et une **base de données**. Vous pourrez ensuite obtenir l'**URL de connexion** pour votre base de données MongoDB.
    
- ```env
- DATABASE_URL="mongodb://localhost:27017/tisseadatabase" # ou l'URL MongoDB Atlas si vous l'utilisez
- NODE_ENV=development
- PORT=5000
- JWT_SECRET="votre_clé_secrète"  # Utilisée pour les tokens JWT
- ```
+   ```plaintext
+   mongodb+srv://<username>:<db_password>@cluster0.mongodb.net/tisseadatabase
+   ```
 
-3. **Vérifier la base de données dans MongoDB Compass**  
-Une fois votre base de données configurée, ouvrez MongoDB Compass, connectez-vous à votre instance MongoDB, et vérifiez que la base de données `tisseadatabase` est bien présente.
+5. **Se connecter à MongoDB Compass**  
+   Vous pouvez vous connecter à MongoDB Compass. Assurez-vous que la base de données `tisseadatabase` existe.
 
-### 4. Appliquer les migrations Prisma
-Prisma est utilisé pour interagir avec la base de données.
-Avant de lancer l'API, vous devez appliquer les migrations pour créer les tables nécessaires.
+### 4. Créer le fichier `.env`
+Créez un fichier `.env` à la racine du projet avec le contenu suivant :
+
+```env
+MONGO_URI="mongodb+srv://<username>:<db_password>@cluster0.mongodb.net/tisseadatabase"
+NODE_ENV=development
+PORT=5000
+JWT_SECRET="votre_clé_secrète"  # Utilisée pour les tokens JWT
+```
+
+**Remarque :** Remplacez `<username>` et `<db_password>` par vos identifiants MongoDB.
+
+### 5. Appliquer les migrations Prisma
+Prisma est utilisé pour interagir avec la base de données.  
+Avant de lancer l'API, vous devez appliquer les migrations pour créer les tables nécessaires :
 ```sh
 npx prisma db push
 ```
 
-Puis, générez les clients Prisma :
+Ensuite, générez le client Prisma :
 ```sh
 npx prisma generate
 ```
 
-### 5. Peupler la base de données
-Après avoir configuré la base de données pour peupler la base de données exécutez le seeder pour insérer des données dans la base :
+### 6. Peupler la base de données
+Après avoir configuré la base de données, exécutez le seeder pour insérer des données :
 ```sh
 npm run seed
 ```
 
-### 6. Démarrer l'API
+### 7. Démarrer l'API
 Une fois les migrations appliquées et les données initiales insérées, vous pouvez démarrer l'API avec la commande suivante :
 ```sh
 npm run dev
@@ -95,14 +110,22 @@ Vous pouvez tester les routes suivantes dans Postman.
 
 ## 🧪 Tests
 
-Lancer les tests unitaires avec Vitest :
+Si vous souhaitez générer un rapport HTML des tests, exécutee la commande suivante :
 ```sh
-npm run test
+npx vitest run --reporter=html
 ```
+
+Cela générera un rapport détaillé dans un fichier HTML, que vous pourrez ouvrir dans votre navigateur en utilisant la commande suivante :
+
+```sh
+npx vite preview --outDir html
+```
+
+Cela va créer un répertoire `html` contenant le résultat de la prévisualisation.
 
 ## 🗺️ Frontend (React & Leaflet)
 
-Un mini-frontend est inclus pour afficher les arrêts sur une carte interactive.
+Un frontend est inclus pour afficher les arrêts sur une carte.
 
 1. Allez dans le répertoire `frontend` :
 ```sh
