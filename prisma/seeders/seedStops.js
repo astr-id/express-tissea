@@ -1,9 +1,10 @@
-const Stop = require("../models/stopModel");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const seedStops = async () => {
-  try {
-    await Stop.deleteMany();
-    const stops = [
+
+  await prisma.stop.createMany({
+    data: [
       // Arrêts de tram T1
       { name: "Palais de Justice", latitude: 43.5922, longitude: 1.4447 },
       { name: "Ile du Ramier", latitude: 43.5922, longitude: 1.4411 },
@@ -66,14 +67,10 @@ const seedStops = async () => {
       { name: "Roseraie", latitude: 43.62, longitude: 1.4694 },
       { name: "Argoulets", latitude: 43.6244, longitude: 1.4769 },
       { name: "Balma - Gramont", latitude: 43.6297, longitude: 1.4831 },
-    ];
+    ],
+  });
 
-    // Insérer les arrêts dans la base de données
-    const documents = await Stop.insertMany(stops);
-    console.log("Arrêts insérés avec succès.", documents);
-  } catch (error) {
-    console.error("Erreur lors de l'insertion des arrêts :", error);
-  }
+  console.log("Arrêts insérés.");
 };
 
 module.exports = seedStops;

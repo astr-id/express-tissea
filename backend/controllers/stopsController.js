@@ -1,13 +1,15 @@
-const Stop = require("../models/stopModel");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
-// Get - /api/stops
 exports.getStops = async (req, res) => {
   try {
-    const stops = await Stop.find();
+    const stops = await prisma.stop.findMany();
     res.status(200).json(stops);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des arrêts.", error });
+    console.error("Erreur :", error);
+    res.status(500).json({
+      message: "Erreur lors de la récupération des arrêts.",
+      error: error.message,
+    });
   }
 };
