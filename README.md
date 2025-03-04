@@ -1,9 +1,9 @@
-# API Tisséa
+# 🚌 API Tisséa
 
-Réalisée par Astrid Pierron  
+Réalisée par ✨Astrid Pierron✨
 Ce projet est une API REST permettant d'accéder aux informations du réseau de transports en commun.
 
-## Technologies Utilisées
+## 💻 Technologies Utilisées
 
 - **Backend** : Express.js
 - **Base de données** : MongoDB
@@ -12,13 +12,13 @@ Ce projet est une API REST permettant d'accéder aux informations du réseau de 
 - **Cartographie** : Leaflet
 - **Tests** : Vitest
 
-## Prérequis
+## 🔧 Prérequis
 
 Avant de commencer, assurez-vous d'avoir installé les éléméents suivants :
 - [Node.js](https://nodejs.org/)
 - [MongoDB Compass](https://www.mongodb.com/products/compass)
 
-## Installation
+## ⚙️ Installation
 
 ### 1. Cloner le repository
 ```sh
@@ -93,14 +93,14 @@ Vous pouvez tester les routes suivantes dans Postman.
 - `PUT /api/categories/:id/lines/:id` : Modifier une ligne
 - `DELETE /api/categories/:id/lines/:id/stops/:id` : Supprimer un arrêt
 
-## Tests
+## 🧪 Tests
 
 Lancer les tests unitaires avec Vitest :
 ```sh
 npm run test
 ```
 
-## Frontend (React & Leaflet)
+## 🗺️ Frontend (React & Leaflet)
 
 Un mini-frontend est inclus pour afficher les arrêts sur une carte interactive.
 
