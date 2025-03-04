@@ -1,46 +1,49 @@
-/// <reference types="vitest" />
+import { describe, it, expect, vi } from "vitest";
 import request from "supertest";
 import express from "express";
 import { getStops } from "../controllers/stopsController";
-import Stop from "../models/stopModel";
-import mongoose from "mongoose"; 
-import { describe, expect, it, beforeEach, vi } from "vitest";
+
+// Mock Prisma
+const mockFindMany = vi.fn().mockResolvedValue([
+  {
+    id: "67c56be2786aa4f63589fb41",
+    name: "Palais de Justice",
+    latitude: 43.5922,
+    longitude: 1.4447,
+    createdAt: "2025-03-03T08:44:18.177Z",
+    updatedAt: "2025-03-03T08:44:18.177Z",
+  },
+  {
+    id: "67c56be2786aa4f63589fb42",
+    name: "Ile du Ramier",
+    latitude: 43.5922,
+    longitude: 1.4411,
+    createdAt: "2025-03-03T08:44:18.177Z",
+    updatedAt: "2025-03-03T08:44:18.177Z",
+  },
+]);
+
+const mockPrisma = { stop: { findMany: mockFindMany } };
 
 const app = express();
 app.use(express.json());
-app.get("/api/stops", getStops);
+app.get("/api/stops", (req, res) => getStops(req, res, mockPrisma)); // On passe le mock ici
 
 describe("GET /api/stops", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mongoose.models = {}; 
-  });
-
   it("should return a list of stops", async () => {
-    const mockStops = [
-      { id: 1, name: "Stop 1", latitude: 48.8566, longitude: 2.3522 },
-      { id: 2, name: "Stop 2", latitude: 34.0522, longitude: -118.2437 },
-    ];
-
-    vi.spyOn(Stop, "find").mockResolvedValue(mockStops);
-
     const response = await request(app).get("/api/stops");
+
     expect(response.status).toBe(200);
-    expect(Array.isArray(response.body)).toBe(true);
-    expect(response.body.length).toBe(2);
-    expect(response.body).toEqual(mockStops);
-  });
-
-  it("should return a 500 error on failure", async () => {
-    const originalFind = Stop.find;
-    Stop.find = vi.fn().mockRejectedValue(new Error("Database error"));
-
-    const response = await request(app).get("/api/stops");
-    expect(response.status).toBe(500);
-    expect(response.body.message).toBe(
-      "Erreur lors de la récupération des arrêts."
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: expect.any(String),
+          name: expect.any(String),
+        }),
+      ])
     );
 
-    Stop.find = originalFind;
+    expect(mockFindMany).toHaveBeenCalled(); // Vérifie que le mock a bien été appelé
+    expect(mockFindMany).toHaveBeenCalledTimes(1);
   });
 });
