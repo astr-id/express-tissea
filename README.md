@@ -119,4 +119,4 @@ npm install
 npm start
 ```
 
-Accédez à `[http://localhost:5173](http://localhost:3000/)` pour voir la carte.
+Accédez à `http://localhost:3000/` pour voir la carte.
