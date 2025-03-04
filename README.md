@@ -22,7 +22,7 @@ Avant de commencer, assurez-vous d'avoir installé les éléméents suivants :
 
 ### 1. Cloner le repository
 ```sh
-git clone https://github.com/votre-repo.git
+https://github.com/astr-id/express-tissea.git
 cd express-tissea
 ```
 
