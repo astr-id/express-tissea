@@ -86,7 +86,7 @@ npm run dev
 ```
 L'API sera disponible à l'adresse `http://localhost:5000`.
 
-## Endpoints Principaux
+## 🛣️ Endpoints Principaux
 
 Vous pouvez tester les routes suivantes dans Postman.
 
