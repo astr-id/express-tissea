@@ -130,9 +130,12 @@ exports.addStop = async (req, res) => {
     }
 
     // Vérifie si l'arrêt existe déjà
-    let stop = await prisma.stop.findUnique({
-      where: { name: stopName },
+    let stop = await prisma.stop.findFirst({
+      where: {
+        name: stopName, 
+      },
     });
+
 
     // Si l'arrêt existe, vérifier s'il est déjà sur la ligne
     if (stop) {

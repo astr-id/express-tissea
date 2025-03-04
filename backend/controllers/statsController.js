@@ -1,19 +1,18 @@
 const { PrismaClient } = require("@prisma/client");
 const haversine = require("haversine-distance");
-
 const prisma = new PrismaClient();
+
 // 4. GET - api/stats/distance/stops/:id/:id
 // Calcule et retourne la distance en kilomètre entre les deux arrêts donnés précisée par :id/:id
 exports.getDistanceBetweenStops = async (req, res, prismaClient = prisma) => {
- 
+  console.log(req.params);
   try {
     const { startStopId, endStopId } = req.params;
 
-    // Recherche des arrêts par ID
+    // Recherche des arrêts par ID (en utilisant directement les String)
     const startStop = await prismaClient.stop.findUnique({
       where: { id: startStopId },
     });
-
     const endStop = await prismaClient.stop.findUnique({
       where: { id: endStopId },
     });
@@ -46,47 +45,74 @@ exports.getDistanceBetweenStops = async (req, res, prismaClient = prisma) => {
 // Calcule et retourne la distance en kilomètre de la ligne entière précisée par :id
 exports.getDistanceOfLine = async (req, res, prismaClient = prisma) => {
   try {
-    const { id: lineId } = req.params;
+    const { id } = req.params;
 
-    // Vérifier si la ligne existe
-    const line = await prismaClient.line.findUnique({
-      where: { id: lineId },
+    // Recherche de la ligne avec les arrêts associés 
+    const lineWithStops = await prismaClient.line.findUnique({
+      where: { id },
+      include: {
+        stops: {
+          include: {
+            stop: true,
+          },
+        },
+      },
     });
 
-    if (!line) {
-      return res.status(404).json({ message: "Cette ligne n'existe pas." });
+    console.log(lineWithStops);
+
+    // Vérification si la ligne existe et si elle a des arrêts
+    if (!lineWithStops || lineWithStops.stops.length < 2) {
+      return res
+        .status(404)
+        .json({ message: "La ligne n'existe pas ou n'a pas assez d'arrêts." });
     }
 
-    // Récupérer tous les arrêts associés à la ligne triés par ordre
-    const lineStops = await prismaClient.lineStop.findMany({
-      where: { lineId },
-      include: { stop: true },
-      orderBy: { order: "asc" }, // Trie les arrêts dans l'ordre d'apparition
-    });
+    // Calcul de la distance totale de la ligne
+    let distance = 0;
+    for (let i = 0; i < lineWithStops.stops.length - 1; i++) {
+      const stop1 = lineWithStops.stops[i].stop;
+      const stop2 = lineWithStops.stops[i + 1].stop;
 
-    let totalDistance = 0;
+      // Vérification si les arrêts ont des coordonnées valides
+      if (
+        !stop1.latitude ||
+        !stop1.longitude ||
+        !stop2.latitude ||
+        !stop2.longitude
+      ) {
+        return res
+          .status(400)
+          .json({
+            message:
+              "Certaines coordonnées d'arrêt sont manquantes ou invalides.",
+          });
+      }
 
-    // Parcours de la liste des arrêts pour calculer la distance totale
-    for (let i = 0; i < lineStops.length - 1; i++) {
-      const startStop = lineStops[i].stop;
-      const endStop = lineStops[i + 1].stop;
-
-      // Calcul de la distance entre deux arrêts successifs
-      totalDistance += haversine(
-        { lat: startStop.latitude, lon: startStop.longitude },
-        { lat: endStop.latitude, lon: endStop.longitude }
+      // Calcul de la distance entre deux arrêts
+      const segmentDistance = haversine(
+        { lat: stop1.latitude, lon: stop1.longitude },
+        { lat: stop2.latitude, lon: stop2.longitude }
       );
+
+      // Vérification que la distance est valide
+      if (isNaN(segmentDistance)) {
+        return res
+          .status(400)
+          .json({
+            message: "Erreur lors du calcul de la distance entre les arrêts.",
+          });
+      }
+
+      distance += segmentDistance;
     }
 
-    // Convertir la distance en kilomètres
-    const totalDistanceInKm = (totalDistance / 1000).toFixed(2);
-
-    // Retourne la distance totale de la ligne
-    res.status(200).json({ distance: totalDistanceInKm });
+    // Retourne la distance en kilomètres avec 2 décimales
+    res.status(200).json({ distance: (distance / 1000).toFixed(2) });
   } catch (error) {
     console.error("Erreur :", error);
     res.status(500).json({
-      message: "Erreur lors du calcul de la distance de la ligne.",
+      message: "Erreur lors du calcul de la distance.",
       error: error.message,
     });
   }
