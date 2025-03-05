@@ -19,11 +19,11 @@ let createdData = false;
 
 beforeAll(async () => {
   const stop1 = await prisma.stop.findUnique({
-    where: { id: new ObjectId("67c7069af86ce712949262eb") }, // Utilisez un ObjectId valide
+    where: { id: new ObjectId("67c80815c9edd223d7faf4b8") }, // Utilisez un ObjectId valide
   });
 
   const stop2 = await prisma.stop.findUnique({
-    where: { id: new ObjectId("67c7069af86ce712949262ec") }, // Utilisez un ObjectId valide
+    where: { id: new ObjectId("67c80815c9edd223d7faf4b9") }, // Utilisez un ObjectId valide
   });
 
   if (!stop1 || !stop2) {
@@ -58,8 +58,8 @@ afterAll(async () => {
       where: {
         id: {
           in: [
-            new ObjectId("60d21b4667d0d8992e610c85"), // Arrêt 1
-            new ObjectId("67c7069af86ce712949262ec"), // Arrêt 2
+            new ObjectId("67c80815c9edd223d7faf4b8"), // Arrêt 1
+            new ObjectId("67c80815c9edd223d7faf4b9"), // Arrêt 2
           ],
         },
       },
@@ -72,7 +72,7 @@ afterAll(async () => {
 describe("GET /api/stats/distance/stops/:startStopId/:endStopId", () => {
   it("devrait renvoyer la distance entre deux arrêts", async () => {
     const response = await request(app).get(
-      "/api/stats/distance/stops/67c7069af86ce712949262eb/67c7069af86ce712949262ec" 
+      "/api/stats/distance/stops/67c80815c9edd223d7faf4b8/67c80815c9edd223d7faf4b9"
     );
 
     expect(response.status).toBe(200);

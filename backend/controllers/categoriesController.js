@@ -277,6 +277,11 @@ exports.deleteStop = async (req, res) => {
       },
     });
 
+    await prisma.stop.delete({
+      where: { id: stopId },
+    });
+
+    // Répondre avec succès
     res.status(200).json({ message: "Arrêt supprimé avec succès." });
   } catch (error) {
     console.error("Erreur Prisma :", error);
