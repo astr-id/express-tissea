@@ -132,10 +132,9 @@ exports.addStop = async (req, res) => {
     // Vérifie si l'arrêt existe déjà
     let stop = await prisma.stop.findFirst({
       where: {
-        name: stopName, 
+        name: stopName,
       },
     });
-
 
     // Si l'arrêt existe, vérifier s'il est déjà sur la ligne
     if (stop) {
@@ -158,6 +157,26 @@ exports.addStop = async (req, res) => {
           name: stopName,
           latitude: stopLatitude,
           longitude: stopLongitude,
+        },
+      });
+    }
+
+    // Vérifie si un arrêt avec cet ordre existe déjà
+    const existingStop = await prisma.lineStop.findFirst({
+      where: { lineId, order },
+    });
+
+    // Décaler les arrêts existants si nécessaire
+    if (existingStop) {
+      await prisma.lineStop.updateMany({
+        where: {
+          lineId,
+          order: { gte: order },
+        },
+        data: {
+          order: {
+            increment: 1,
+          },
         },
       });
     }
