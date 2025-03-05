@@ -110,6 +110,13 @@ Vous pouvez tester les routes suivantes dans Postman.
 
 ## 🧪 Tests
 
+Avez de lancer les tests, il faut modifier le fichier `stats.test.js` afin d'utiliser des ID valident.
+
+Vous pourrez ensuite faire la commande :
+```sh
+npm run test
+```
+
 Si vous souhaitez générer un rapport HTML des tests, exécutee la commande suivante :
 ```sh
 npx vitest run --reporter=html
@@ -120,8 +127,6 @@ Cela générera un rapport détaillé dans un fichier HTML, que vous pourrez ouv
 ```sh
 npx vite preview --outDir html
 ```
-
-Cela va créer un répertoire `html` contenant le résultat de la prévisualisation.
 
 ## 🗺️ Frontend (React & Leaflet)
 
